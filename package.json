@@ -1,0 +1,203 @@
+{
+  "name": "ide-xml",
+  "author": "lumine-code",
+  "description": "Provide XML intelligence with Eclipse LemMinX.",
+  "repository": "https://github.com/lumine-code/ide-xml",
+  "bugs": {
+    "url": "https://github.com/lumine-code/ide-xml/issues"
+  },
+  "keywords": [
+    "xsd",
+    "dtd",
+    "xslt",
+    "schema",
+    "lemminx",
+    "validation"
+  ],
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "lumine": "^1.0.0"
+  },
+  "main": "./lib/main",
+  "files": [
+    "lib",
+    "spec"
+  ],
+  "scripts": {
+    "test": "lumine --test spec",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:node": "node --test spec/helpers/server-checks.js"
+  },
+  "consumedServices": {
+    "ide-client": {
+      "versions": {
+        "^1.0.0": "consumeIdeClient"
+      }
+    }
+  },
+  "providedServices": {
+    "background-tips.provider": {
+      "versions": {
+        "1.0.0": "provideBackgroundTips"
+      }
+    }
+  },
+  "specPackages": [
+    "ide-client",
+    "language-xml"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-n": "^18.4.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
+    "vscode-jsonrpc": "^9.0.3"
+  },
+  "configSchema": {
+    "serverJar": {
+      "title": "Server JAR",
+      "description": "Absolute path to the complete LemMinX uber JAR. Leave empty to use the managed installation, then LEMMINX_JAR.",
+      "type": "string",
+      "default": ""
+    },
+    "javaPath": {
+      "title": "Java Path",
+      "description": "Absolute path to a Java 11 or newer java executable. Leave empty to use JDK_HOME, JAVA_HOME, then PATH.",
+      "type": "string",
+      "default": ""
+    },
+    "maxHeap": {
+      "title": "Maximum Heap",
+      "description": "Maximum memory in MiB for each XML language server.",
+      "type": "integer",
+      "minimum": 128,
+      "default": 512
+    },
+    "notifyWhenMissing": {
+      "title": "Notify When Missing",
+      "description": "Offer to install LemMinX when its server or a supported Java runtime cannot be found.",
+      "type": "boolean",
+      "default": true
+    },
+    "features": {
+      "title": "Features",
+      "description": "Which supported XML features the editor uses.",
+      "type": "object",
+      "scopeResolution": "grammar",
+      "properties": {
+        "diagnostics": {
+          "title": "Diagnostics",
+          "description": "Report XML syntax and schema validation errors.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "autocomplete": {
+          "title": "Autocomplete",
+          "description": "Complete XML elements and attributes from schemas.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "hover": {
+          "title": "Hover",
+          "description": "Show element and attribute schema documentation.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "definition": {
+          "title": "Go To Definition",
+          "description": "Navigate to schema declarations.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "references": {
+          "title": "Find References",
+          "description": "Find XML Schema declaration references.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "symbols": {
+          "title": "Symbols",
+          "description": "Navigate XML elements in the current document.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "format": {
+          "title": "Format",
+          "description": "Format XML documents and selections.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "rename": {
+          "title": "Rename",
+          "description": "Rename matching tags and schema declarations.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        },
+        "codeActions": {
+          "title": "Code Actions",
+          "description": "Apply XML syntax and validation fixes.",
+          "type": "boolean",
+          "scopeResolution": "grammar",
+          "default": true
+        }
+      },
+      "default": {}
+    },
+    "catalogs": {
+      "title": "XML Catalogs",
+      "description": "Catalog file paths or URLs for resolving schemas and DTDs. Relative paths resolve from the project folder.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "fileAssociations": {
+      "title": "File Associations",
+      "description": "Associate document filename patterns with schema or DTD paths or URLs.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "title": "Pattern",
+            "description": "Filename pattern to associate, including * and ? wildcards.",
+            "type": "string",
+            "default": ""
+          },
+          "systemId": {
+            "title": "Schema or DTD",
+            "description": "Schema or DTD file path or URL for matching documents.",
+            "type": "string",
+            "default": ""
+          }
+        }
+      },
+      "default": []
+    },
+    "splitAttributes": {
+      "title": "Split Attributes",
+      "description": "Put each XML attribute on its own line when formatting. Server Default preserves the upstream default.",
+      "type": "string",
+      "enum": [
+        "server-default",
+        "yes",
+        "no"
+      ],
+      "default": "server-default"
+    }
+  }
+}
