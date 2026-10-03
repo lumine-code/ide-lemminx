@@ -1,16 +1,16 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { createProject, removeProject } = require("./helpers/project");
-describe("ide-xml discovery and managed metadata", () => {
+describe("ide-lemminx discovery and managed metadata", () => {
   let fixture, server;
   beforeEach(async () => {
     jasmine.useRealClock();
     fixture = createProject();
-    await lumine.packages.activatePackage("ide-xml");
+    await lumine.packages.activatePackage("ide-lemminx");
     server = require("../lib/server");
   });
   afterEach(async () => {
-    await lumine.packages.deactivatePackage("ide-xml");
+    await lumine.packages.deactivatePackage("ide-lemminx");
     removeProject(fixture.rootPath);
   });
   it("validates supported Java runtimes and explicit paths", async () => {
@@ -96,10 +96,10 @@ describe("ide-xml discovery and managed metadata", () => {
     expect(downloadFile.calls.count()).toBe(1);
   });
 });
-describe("ide-xml service edges and settings", () => {
+describe("ide-lemminx service edges and settings", () => {
   let main, adapter, edge, cleanup;
   beforeEach(async () => {
-    main = (await lumine.packages.activatePackage("ide-xml")).mainModule;
+    main = (await lumine.packages.activatePackage("ide-lemminx")).mainModule;
     cleanup = jasmine.createSpy("cleanup");
     edge = main.consumeIdeClient({
       registerAdapter(value) {
@@ -111,8 +111,8 @@ describe("ide-xml service edges and settings", () => {
   afterEach(async () => {
     edge.dispose();
     for (const key of ["catalogs", "fileAssociations", "splitAttributes"])
-      lumine.config.unset(`ide-xml.${key}`);
-    await lumine.packages.deactivatePackage("ide-xml");
+      lumine.config.unset(`ide-lemminx.${key}`);
+    await lumine.packages.deactivatePackage("ide-lemminx");
   });
   it("serves XML and XSL without advertising unsupported settings", () => {
     expect(adapter.grammarScopes).toEqual(["text.xml", "text.xml.xsl"]);
@@ -129,16 +129,16 @@ describe("ide-xml service edges and settings", () => {
       expect(features[feature]).toBeUndefined();
     }
     expect(adapter.isFeatureAvailable("rename")).toBe(true);
-    expect(main.provideBackgroundTips().packageName).toBe("ide-xml");
+    expect(main.provideBackgroundTips().packageName).toBe("ide-lemminx");
   });
   it("preserves upstream formatting defaults and forwards schema overrides", () => {
     expect(adapter.getWorkspaceConfiguration("xml.format")).toBeUndefined();
     expect(adapter.getWorkspaceConfiguration("xml.validation.noGrammar")).toBe("ignore");
-    lumine.config.set("ide-xml.catalogs", ["catalog.xml"]);
-    lumine.config.set("ide-xml.fileAssociations", [
+    lumine.config.set("ide-lemminx.catalogs", ["catalog.xml"]);
+    lumine.config.set("ide-lemminx.fileAssociations", [
       { pattern: "document.xml", systemId: "schema.xsd" },
     ]);
-    lumine.config.set("ide-xml.splitAttributes", "yes");
+    lumine.config.set("ide-lemminx.splitAttributes", "yes");
     expect(adapter.getWorkspaceConfiguration("xml.catalogs")).toEqual(["catalog.xml"]);
     expect(adapter.getWorkspaceConfiguration("xml.fileAssociations")[0].systemId).toBe(
       "schema.xsd",
@@ -158,13 +158,13 @@ describe("ide-xml service edges and settings", () => {
     expect(cleanup).toHaveBeenCalled();
     expect(secondCleanup).not.toHaveBeenCalled();
     second.dispose();
-    const packagePath = lumine.packages.getActivePackage("ide-xml").path;
-    await lumine.packages.deactivatePackage("ide-xml");
-    await lumine.packages.unloadPackage("ide-xml");
+    const packagePath = lumine.packages.getActivePackage("ide-lemminx").path;
+    await lumine.packages.deactivatePackage("ide-lemminx");
+    await lumine.packages.unloadPackage("ide-lemminx");
     await lumine.packages.loadPackage(packagePath);
-    const current = (await lumine.packages.activatePackage("ide-xml")).mainModule;
+    const current = (await lumine.packages.activatePackage("ide-lemminx")).mainModule;
     expect(current).not.toBe(main);
-    expect(current.provideBackgroundTips().packageName).toBe("ide-xml");
+    expect(current.provideBackgroundTips().packageName).toBe("ide-lemminx");
   });
   it("reports missing dependencies through the client", async () => {
     spyOn(require("../lib/server"), "resolveServer").and.resolveTo(null);
@@ -179,7 +179,7 @@ describe("ide-xml service edges and settings", () => {
     });
     try {
       expect(await registered.resolveServer({ rootPath: "/project" })).toBeNull();
-      expect(missing.calls.mostRecent().args[0]).toBe("ide-xml");
+      expect(missing.calls.mostRecent().args[0]).toBe("ide-lemminx");
     } finally {
       registration.dispose();
     }

@@ -3,7 +3,9 @@ const os = require("node:os");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 const createProject = () => {
-  const temporaryRoot = fs.mkdtempSync(path.join(fs.realpathSync.native(os.tmpdir()), "ide-xml-"));
+  const temporaryRoot = fs.mkdtempSync(
+    path.join(fs.realpathSync.native(os.tmpdir()), "ide-lemminx-"),
+  );
   const rootPath = path.join(temporaryRoot, "project");
   fs.mkdirSync(rootPath);
   const texts = {
@@ -43,7 +45,7 @@ const removeProject = (rootPath) => {
   const target = path.dirname(path.resolve(rootPath));
   if (
     path.dirname(target) !== fs.realpathSync.native(os.tmpdir()) ||
-    !path.basename(target).startsWith("ide-xml-")
+    !path.basename(target).startsWith("ide-lemminx-")
   )
     throw new Error(`Refusing to remove a non-test directory: ${target}`);
   fs.rmSync(target, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 });

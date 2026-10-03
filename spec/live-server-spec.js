@@ -10,7 +10,7 @@ const javaPath =
 if (process.env.REQUIRE_LEMMINX && (!serverJar || !javaPath))
   throw new Error("CI requires a real LemMinX JAR and Java runtime.");
 const liveSuite = serverJar && javaPath ? describe : () => {};
-liveSuite("ide-xml real LemMinX protocol and managed pipeline", () => {
+liveSuite("ide-lemminx real LemMinX protocol and managed pipeline", () => {
   let fixture, client, adapter, edge, timeout;
   beforeAll(() => {
     timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
@@ -22,9 +22,9 @@ liveSuite("ide-xml real LemMinX protocol and managed pipeline", () => {
   beforeEach(async () => {
     jasmine.useRealClock();
     fixture = createProject();
-    lumine.config.set("ide-xml.serverJar", serverJar);
-    lumine.config.set("ide-xml.javaPath", javaPath);
-    const main = (await lumine.packages.activatePackage("ide-xml")).mainModule;
+    lumine.config.set("ide-lemminx.serverJar", serverJar);
+    lumine.config.set("ide-lemminx.javaPath", javaPath);
+    const main = (await lumine.packages.activatePackage("ide-lemminx")).mainModule;
     edge = main.consumeIdeClient({
       registerAdapter(value) {
         adapter = value;
@@ -37,8 +37,8 @@ liveSuite("ide-xml real LemMinX protocol and managed pipeline", () => {
     await client.stop();
     edge.dispose();
     for (const key of ["serverJar", "javaPath", "fileAssociations"])
-      lumine.config.unset(`ide-xml.${key}`);
-    await lumine.packages.deactivatePackage("ide-xml");
+      lumine.config.unset(`ide-lemminx.${key}`);
+    await lumine.packages.deactivatePackage("ide-lemminx");
     removeProject(fixture.rootPath);
   });
   it("returns all supported XML features from the actual Eclipse release", async () => {
@@ -58,22 +58,22 @@ liveSuite("ide-xml real LemMinX protocol and managed pipeline", () => {
       { storageRoot: path.join(fixture.configDirPath, "managed") },
     );
     try {
-      const record = await managed.install("ide-xml", { version: "0.31.2" });
+      const record = await managed.install("ide-lemminx", { version: "0.31.2" });
       expect(record.checksum).toBe(
         "sha256:f4fde164e785c635e5f86361dbf4b993bfe2c5f83fdb52891d058b7dfc9bcfc8",
       );
-      lumine.config.set("ide-xml.serverJar", "");
+      lumine.config.set("ide-lemminx.serverJar", "");
       await client.start(managed.installFor(adapter));
       expect((await exerciseServer(client, fixture)).length).toBe(10);
       await client.stop();
-      await managed.uninstall("ide-xml");
+      await managed.uninstall("ide-lemminx");
       expect(managed.installFor(adapter)).toBeNull();
     } finally {
       managed.emitter.dispose();
     }
   });
   it("uses a configured file association without editing the XML declaration", async () => {
-    lumine.config.set("ide-xml.fileAssociations", [
+    lumine.config.set("ide-lemminx.fileAssociations", [
       { pattern: "associated.xml", systemId: fixture.files.schema },
     ]);
     await client.start();

@@ -16,7 +16,7 @@ const until = async (check, label) => {
   }
   throw new Error(`${label} timed out`);
 };
-liveSuite("ide-xml actual editor providers", () => {
+liveSuite("ide-lemminx actual editor providers", () => {
   let fixture, editors, paths, service, timeout, published, subscription;
   beforeAll(() => {
     timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
@@ -31,9 +31,9 @@ liveSuite("ide-xml actual editor providers", () => {
     editors = {};
     paths = lumine.project.getPaths();
     published = [];
-    lumine.config.set("ide-xml.serverJar", serverJar);
-    lumine.config.set("ide-xml.javaPath", javaPath);
-    for (const name of ["language-xml", "ide-client", "ide-xml"])
+    lumine.config.set("ide-lemminx.serverJar", serverJar);
+    lumine.config.set("ide-lemminx.javaPath", javaPath);
+    for (const name of ["language-xml", "ide-client", "ide-lemminx"])
       await lumine.packages.activatePackage(name);
     service = lumine.packages.getActivePackage("ide-client").mainModule.provideIdeClient();
     subscription = service.onDidPublishDiagnostics((value) => published.push(value));
@@ -50,7 +50,7 @@ liveSuite("ide-xml actual editor providers", () => {
     for (const editor of Object.values(editors)) editor?.destroy();
     for (const editor of lumine.workspace.getTextEditors())
       if (editor.getPath()?.startsWith(fixture.rootPath)) editor.destroy();
-    for (const name of ["ide-xml", "ide-client", "language-xml"])
+    for (const name of ["ide-lemminx", "ide-client", "language-xml"])
       await lumine.packages.deactivatePackage(name);
     for (const key of [
       "serverJar",
@@ -65,7 +65,7 @@ liveSuite("ide-xml actual editor providers", () => {
       "features.symbols",
       "features.definition",
     ])
-      lumine.config.unset(`ide-xml.${key}`);
+      lumine.config.unset(`ide-lemminx.${key}`);
     lumine.project.setPaths(paths);
     await lumine.fileWatchClient.settlePendingTeardown();
     removeProject(fixture.rootPath);
@@ -79,7 +79,7 @@ liveSuite("ide-xml actual editor providers", () => {
     const session = await until(
       async () =>
         (await service.activeSessionsForEditor(editors.main)).find(
-          ({ adapter }) => adapter.id === "ide-xml",
+          ({ adapter }) => adapter.id === "ide-lemminx",
         ),
       "XML session",
     );
@@ -146,7 +146,7 @@ liveSuite("ide-xml actual editor providers", () => {
     expect(Point.fromObject(edits[1].oldRange.start || edits[1].oldRange[0]).column).toBe(
       position(fixture.texts.main, "</title", 2).character,
     );
-    expect(service.adaptersForEditor(editors.xsl).map(({ id }) => id)).toContain("ide-xml");
+    expect(service.adaptersForEditor(editors.xsl).map(({ id }) => id)).toContain("ide-lemminx");
   });
   it("applies a genuine XML quick fix and honours feature switches", async () => {
     const session = await ready(),
@@ -165,13 +165,13 @@ liveSuite("ide-xml actual editor providers", () => {
     expect(fix).toBeTruthy();
     await fix.selected();
     expect(editors.malformed.getText()).toContain("</book>");
-    lumine.config.set("ide-xml.features.format", false);
+    lumine.config.set("ide-lemminx.features.format", false);
     expect(await m.provideCodeFormatFile().formatEntireFile(editors.main)).toEqual([]);
-    lumine.config.set("ide-xml.features.rename", false);
+    lumine.config.set("ide-lemminx.features.rename", false);
     expect(
       await m.provideRefactor().rename(editors.main, point("main", "<title", 2), "heading"),
     ).toBeNull();
-    lumine.config.set("ide-xml.features.hover", false);
+    lumine.config.set("ide-lemminx.features.hover", false);
     expect(await m.provideHover().hover(editors.main, point("main", "<book", 2))).toBeNull();
     expect(session.supports("textDocument/hover", editors.main)).toBe(false);
     expect(session.supports("textDocument/codeLens", editors.main)).toBe(false);
@@ -182,7 +182,7 @@ liveSuite("ide-xml actual editor providers", () => {
       ["definition", "textDocument/definition"],
       ["codeActions", "textDocument/codeAction"],
     ]) {
-      lumine.config.set(`ide-xml.features.${feature}`, false);
+      lumine.config.set(`ide-lemminx.features.${feature}`, false);
       expect(session.supports(method, editors.main)).toBe(false);
     }
     expect(
@@ -211,7 +211,7 @@ liveSuite("ide-xml actual editor providers", () => {
         .provideIntentionsList()
         .getIntentions({ textEditor: editors.malformed, bufferPosition: new Point(0, 2) }),
     ).toEqual([]);
-    lumine.config.set("ide-xml.features.diagnostics", false);
+    lumine.config.set("ide-lemminx.features.diagnostics", false);
     expect(service.featureEnabled(session.adapter, "diagnostics", editors.broken)).toBe(false);
   });
   it("publishes XSD and DTD diagnostics, clears edits and restarts an unloaded generation", async () => {
@@ -231,15 +231,15 @@ liveSuite("ide-xml actual editor providers", () => {
           .some(({ uri, diagnostics }) => uri === fixture.uris.broken && diagnostics.length === 0),
       "cleared XML diagnostics",
     );
-    const pkg = lumine.packages.getActivePackage("ide-xml"),
+    const pkg = lumine.packages.getActivePackage("ide-lemminx"),
       oldMain = pkg.mainModule,
       packagePath = pkg.path;
-    await lumine.packages.deactivatePackage("ide-xml");
+    await lumine.packages.deactivatePackage("ide-lemminx");
     await until(() => previous.state === "stopped", "XML teardown");
     expect(service.adaptersForEditor(editors.main)).toEqual([]);
-    await lumine.packages.unloadPackage("ide-xml");
+    await lumine.packages.unloadPackage("ide-lemminx");
     await lumine.packages.loadPackage(packagePath);
-    expect((await lumine.packages.activatePackage("ide-xml")).mainModule).not.toBe(oldMain);
+    expect((await lumine.packages.activatePackage("ide-lemminx")).mainModule).not.toBe(oldMain);
     expect(await ready()).not.toBe(previous);
   });
 });

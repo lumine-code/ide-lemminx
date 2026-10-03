@@ -1,4 +1,4 @@
-# ide-xml
+# ide-lemminx
 
 Provide XML intelligence with Eclipse LemMinX.
 
@@ -14,7 +14,7 @@ Eclipse LemMinX runs as a separate Java process and provides schema-aware XML ed
 
 ## Installation
 
-To install `ide-xml` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/ide-xml`.
+To install `ide-lemminx` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/ide-lemminx`.
 
 Install `ide-client` and `language-xml`, then install Eclipse LemMinX through the language server management view. A Java 11 or newer runtime is required on Windows, macOS and Linux; Java 21 is a suitable supported runtime. The package does not install Java or change the system environment.
 

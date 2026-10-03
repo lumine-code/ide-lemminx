@@ -1,17 +1,17 @@
 {
-  "name": "ide-xml",
+  "name": "ide-lemminx",
   "author": "lumine-code",
   "description": "Provide XML intelligence with Eclipse LemMinX.",
-  "repository": "https://github.com/lumine-code/ide-xml",
+  "repository": "https://github.com/lumine-code/ide-lemminx",
   "bugs": {
-    "url": "https://github.com/lumine-code/ide-xml/issues"
+    "url": "https://github.com/lumine-code/ide-lemminx/issues"
   },
   "keywords": [
+    "xml",
     "xsd",
     "dtd",
     "xslt",
     "schema",
-    "lemminx",
     "validation"
   ],
   "version": "1.0.0",
