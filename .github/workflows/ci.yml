@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "21.0.12.1"
+          java-version: "21"
       - run: npm run test:node
         env:
           REQUIRE_LEMMINX: 1
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "21.0.12.1"
+          java-version: "21"
       - name: Install the exact checksum-verified LemMinX release
         run: |
           curl --fail --location --retry 3 --output lemminx.jar https://repo.eclipse.org/repository/lemminx-maven2-releases/org/eclipse/lemminx/org.eclipse.lemminx/0.31.2/org.eclipse.lemminx-0.31.2-uber.jar
