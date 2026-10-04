@@ -104,7 +104,7 @@ liveSuite("ide-lemminx actual editor providers", () => {
       ),
     ).toBe(true);
     expect(
-      JSON.stringify(await m.provideHover().hover(editors.main, point("main", "<book", 2))),
+      JSON.stringify(await m.provideContextHelp().getHelp(editors.main, point("main", "<book", 2))),
     ).toContain("A documented book");
     const refs = await m
       .provideFindReferences()
@@ -172,7 +172,9 @@ liveSuite("ide-lemminx actual editor providers", () => {
       await m.provideRefactor().rename(editors.main, point("main", "<title", 2), "heading"),
     ).toBeNull();
     lumine.config.set("ide-lemminx.features.hover", false);
-    expect(await m.provideHover().hover(editors.main, point("main", "<book", 2))).toBeNull();
+    expect(
+      await m.provideContextHelp().getHelp(editors.main, point("main", "<book", 2)),
+    ).toBeNull();
     expect(session.supports("textDocument/hover", editors.main)).toBe(false);
     expect(session.supports("textDocument/codeLens", editors.main)).toBe(false);
     for (const [feature, method] of [
