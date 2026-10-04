@@ -166,7 +166,7 @@ liveSuite("ide-lemminx actual editor providers", () => {
     await fix.selected();
     expect(editors.malformed.getText()).toContain("</book>");
     lumine.config.set("ide-lemminx.features.format", false);
-    expect(await m.provideCodeFormatFile().formatEntireFile(editors.main)).toEqual([]);
+    expect(await m.provideCodeFormatFile().formatEntireFile(editors.main)).toBeNull();
     lumine.config.set("ide-lemminx.features.rename", false);
     expect(
       await m.provideRefactor().rename(editors.main, point("main", "<title", 2), "heading"),
