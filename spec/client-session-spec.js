@@ -33,9 +33,9 @@ liveSuite("ide-lemminx actual editor providers", () => {
     published = [];
     lumine.config.set("ide-lemminx.serverJar", serverJar);
     lumine.config.set("ide-lemminx.javaPath", javaPath);
-    for (const name of ["language-xml", "ide-client", "ide-lemminx"])
+    for (const name of ["language-xml", "ide", "ide-lemminx"])
       await lumine.packages.activatePackage(name);
-    service = lumine.packages.getActivePackage("ide-client").mainModule.provideIdeClient();
+    service = lumine.packages.getActivePackage("ide").mainModule.provideIde();
     subscription = service.onDidPublishDiagnostics((value) => published.push(value));
     lumine.project.setPaths([fixture.rootPath]);
     for (const key of ["main", "schema", "incomplete", "broken", "dtdBroken", "malformed", "xsl"]) {
@@ -50,7 +50,7 @@ liveSuite("ide-lemminx actual editor providers", () => {
     for (const editor of Object.values(editors)) editor?.destroy();
     for (const editor of lumine.workspace.getTextEditors())
       if (editor.getPath()?.startsWith(fixture.rootPath)) editor.destroy();
-    for (const name of ["ide-lemminx", "ide-client", "language-xml"])
+    for (const name of ["ide-lemminx", "ide", "language-xml"])
       await lumine.packages.deactivatePackage(name);
     for (const key of [
       "serverJar",
@@ -74,7 +74,7 @@ liveSuite("ide-lemminx actual editor providers", () => {
     const p = position(fixture.texts[key], fragment, inside);
     return new Point(p.line, p.character);
   };
-  const main = () => lumine.packages.getActivePackage("ide-client").mainModule;
+  const main = () => lumine.packages.getActivePackage("ide").mainModule;
   const ready = async () => {
     const session = await until(
       async () =>
@@ -123,12 +123,12 @@ liveSuite("ide-lemminx actual editor providers", () => {
     expect(
       documentSymbols
         .getDocumentSymbolSources(editors.main)
-        .find(({ id }) => id === "ide-client:ide-lemminx").state,
+        .find(({ id }) => id === "ide:ide-lemminx").state,
     ).toBe("ready");
     expect(
       (
         await documentSymbols.getDocumentSymbols(editors.main, {
-          sourceId: "ide-client:ide-lemminx",
+          sourceId: "ide:ide-lemminx",
         })
       ).some(({ name }) => name === "book"),
     ).toBe(true);
@@ -208,7 +208,7 @@ liveSuite("ide-lemminx actual editor providers", () => {
     ).toBeNull();
     expect(
       await m.provideDocumentSymbolProvider().getDocumentSymbols(editors.main, {
-        sourceId: "ide-client:ide-lemminx",
+        sourceId: "ide:ide-lemminx",
       }),
     ).toBeNull();
     expect(

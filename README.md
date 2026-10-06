@@ -2,7 +2,7 @@
 
 Provide XML intelligence with Eclipse LemMinX.
 
-Eclipse LemMinX runs as a separate Java process and provides schema-aware XML editing through ide-client.
+Eclipse LemMinX runs as a separate Java process and provides schema-aware XML editing through ide.
 
 ## Features
 
@@ -16,7 +16,7 @@ Eclipse LemMinX runs as a separate Java process and provides schema-aware XML ed
 
 To install `ide-lemminx` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/ide-lemminx`.
 
-Install `ide-client` and `language-xml`, then install Eclipse LemMinX through the language server management view. A Java 11 or newer runtime is required on Windows, macOS and Linux; Java 21 is a suitable supported runtime. The package does not install Java or change the system environment.
+Install `ide` and `language-xml`, then install Eclipse LemMinX through the language server management view. A Java 11 or newer runtime is required on Windows, macOS and Linux; Java 21 is a suitable supported runtime. The package does not install Java or change the system environment.
 
 ## Usage
 
@@ -30,7 +30,7 @@ The wrapper is MIT licensed. [Eclipse LemMinX](https://github.com/eclipse-lemmin
 
 ## Services
 
-- `ide-client`: consumed to register the XML server and route its supported language features.
+- `ide`: consumed to register the XML server and route its supported language features.
 - `background-tips.provider`: provided to background-tips with XML schema guidance.
 
 ## Contributing

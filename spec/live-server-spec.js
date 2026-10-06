@@ -25,7 +25,7 @@ liveSuite("ide-lemminx real LemMinX protocol and managed pipeline", () => {
     lumine.config.set("ide-lemminx.serverJar", serverJar);
     lumine.config.set("ide-lemminx.javaPath", javaPath);
     const main = (await lumine.packages.activatePackage("ide-lemminx")).mainModule;
-    edge = main.consumeIdeClient({
+    edge = main.consumeIde({
       registerAdapter(value) {
         adapter = value;
         client = new LiveLspClient(value, fixture.rootPath);
@@ -47,7 +47,7 @@ liveSuite("ide-lemminx real LemMinX protocol and managed pipeline", () => {
     expect(client.registrations.some(({ method }) => method === "textDocument/rename")).toBe(true);
   });
   it("installs the verified full JAR through the real managed pipeline and removes it cleanly", async () => {
-    const packagePath = (await lumine.packages.loadPackage("ide-client")).path;
+    const packagePath = (await lumine.packages.loadPackage("ide")).path;
     const ManagedServers = require(path.join(packagePath, "lib", "managed-servers"));
     const managed = new ManagedServers(
       {

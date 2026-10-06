@@ -35,11 +35,7 @@ class LiveLspClient {
     return (
       this.configurationApi ||
       require(
-        path.join(
-          lumine.packages.resolvePackagePath("ide-client"),
-          "lib",
-          "workspace-configuration",
-        ),
+        path.join(lumine.packages.resolvePackagePath("ide"), "lib", "workspace-configuration"),
       )
     );
   }

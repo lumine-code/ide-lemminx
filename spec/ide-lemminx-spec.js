@@ -135,7 +135,7 @@ describe("ide-lemminx service edges and settings", () => {
   beforeEach(async () => {
     main = (await lumine.packages.activatePackage("ide-lemminx")).mainModule;
     cleanup = jasmine.createSpy("cleanup");
-    edge = main.consumeIdeClient({
+    edge = main.consumeIde({
       registerAdapter(value) {
         adapter = value;
         return { dispose: cleanup };
@@ -181,7 +181,7 @@ describe("ide-lemminx service edges and settings", () => {
   });
   it("disposes only its provider edge and reacquires the current package generation", async () => {
     const secondCleanup = jasmine.createSpy("second cleanup");
-    const second = main.consumeIdeClient({
+    const second = main.consumeIde({
       registerAdapter() {
         return { dispose: secondCleanup };
       },
@@ -202,7 +202,7 @@ describe("ide-lemminx service edges and settings", () => {
     spyOn(require("../lib/server"), "resolveServer").and.resolveTo(null);
     const missing = jasmine.createSpy("missing");
     let registered;
-    const registration = main.consumeIdeClient({
+    const registration = main.consumeIde({
       registerAdapter(value) {
         registered = value;
         return { dispose() {} };

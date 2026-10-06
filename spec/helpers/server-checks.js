@@ -9,9 +9,9 @@ const { createProject, removeProject } = require("./project");
 const { LiveLspClient } = require("./live-lsp-client");
 const { exerciseServer } = require("./exercise-server");
 const clientConfiguration = () => {
-  const clientPath = process.env.LUMINE_TEST_CLIENT_PATH;
+  const clientPath = process.env.LUMINE_TEST_IDE_PATH;
   if (!clientPath)
-    throw new Error("Standalone server checks require LUMINE_TEST_CLIENT_PATH to name ide-client.");
+    throw new Error("Standalone server checks require LUMINE_TEST_IDE_PATH to name ide.");
   return require(path.join(clientPath, "lib", "workspace-configuration"));
 };
 test("reject relative paths, directories, invalid JARs and unstable versions", async () => {
@@ -62,7 +62,7 @@ test("reject absent or mismatched Maven digests before a download", async () => 
     server.fetchText = old;
   }
 });
-if (process.env.LUMINE_TEST_CLIENT_PATH) {
+if (process.env.LUMINE_TEST_IDE_PATH) {
   test("standalone configuration uses the actual client API without an editor global", async () => {
     const fixture = createProject();
     try {
