@@ -7,6 +7,12 @@ const server = require("../../lib/server");
 const { createProject, removeProject } = require("./project");
 const { LiveLspClient } = require("./live-lsp-client");
 const { exerciseServer } = require("./exercise-server");
+const clientConfiguration = () => {
+  const clientPath = process.env.LUMINE_TEST_CLIENT_PATH;
+  if (!clientPath)
+    throw new Error("Standalone server checks require LUMINE_TEST_CLIENT_PATH to name ide-client.");
+  return require(path.join(clientPath, "lib", "workspace-configuration"));
+};
 test("reject relative paths, directories, invalid JARs and unstable versions", async () => {
   const fixture = createProject();
   try {
@@ -49,6 +55,25 @@ test("reject absent or mismatched Maven digests before a download", async () => 
     server.fetchText = old;
   }
 });
+if (process.env.LUMINE_TEST_CLIENT_PATH) {
+  test("standalone configuration uses the actual client API without an editor global", async () => {
+    const fixture = createProject();
+    try {
+      const client = new LiveLspClient(
+        { getSettings: async () => ({ xml: { validation: { enabled: false } } }) },
+        fixture.rootPath,
+        { configurationApi: clientConfiguration() },
+      );
+      assert.deepEqual(
+        await client.configuration([{ section: "xml.validation" }, { section: "constructor" }]),
+        [{ enabled: false }, null],
+      );
+      assert.equal(client.configurationContext().rootPath, fixture.rootPath);
+    } finally {
+      removeProject(fixture.rootPath);
+    }
+  });
+}
 if (process.env.REQUIRE_LEMMINX) {
   test(
     "install and exercise the real checksum-verified universal server",
@@ -57,6 +82,7 @@ if (process.env.REQUIRE_LEMMINX) {
       const fixture = createProject();
       let client;
       try {
+        const configurationApi = clientConfiguration();
         fs.mkdirSync(fixture.configDirPath);
         const installed = await server.installServer({
           storagePath: fixture.configDirPath,
@@ -89,6 +115,7 @@ if (process.env.REQUIRE_LEMMINX) {
             }),
           },
           fixture.rootPath,
+          { configurationApi },
         );
         await client.start({
           version: installed.version,

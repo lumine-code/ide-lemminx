@@ -18,17 +18,31 @@ jobs:
     name: Checks on ${{ matrix.os }} (Node 24)
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ide-lemminx
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      LUMINE_TEST_CLIENT_PATH: ${{ github.workspace }}/ide-client
     steps:
       - uses: actions/checkout@v7
+        with:
+          path: ide-lemminx
+      - uses: actions/checkout@v7
+        with:
+          repository: lumine-code/ide-client
+          path: ide-client
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: ide-lemminx/package-lock.json
       - run: npm ci --ignore-scripts
+      - name: Install the standalone client test peer
+        run: npm ci --omit=dev --ignore-scripts --prefix ../ide-client
       - run: npm audit --audit-level=high
       - uses: actions/setup-java@v6
         with:

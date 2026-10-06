@@ -1,8 +1,5 @@
 const childProcess = require("child_process");
 const path = require("path");
-const { configurationContext, workspaceConfiguration } = require(
-  path.join(lumine.packages.resolvePackagePath("ide-client"), "lib", "workspace-configuration"),
-);
 const { pathToFileURL } = require("url");
 const {
   createMessageConnection,
@@ -21,9 +18,10 @@ const withTimeout = (promise, label, timeout = 10000) => {
 };
 
 class LiveLspClient {
-  constructor(adapter, rootPath) {
+  constructor(adapter, rootPath, { configurationApi } = {}) {
     this.adapter = adapter;
     this.rootPath = rootPath;
+    this.configurationApi = configurationApi;
     this.notifications = [];
     this.stderr = "";
     this.registrations = [];
@@ -32,12 +30,33 @@ class LiveLspClient {
     this.sentRequests = [];
   }
 
+  clientConfiguration() {
+    return (
+      this.configurationApi ||
+      require(
+        path.join(
+          lumine.packages.resolvePackagePath("ide-client"),
+          "lib",
+          "workspace-configuration",
+        ),
+      )
+    );
+  }
+
   configurationContext() {
-    return configurationContext(this.rootPath, this.launch, this.session);
+    return this.clientConfiguration().configurationContext(
+      this.rootPath,
+      this.launch,
+      this.session,
+    );
   }
 
   configuration(items) {
-    return workspaceConfiguration(this.adapter, items, this.configurationContext());
+    return this.clientConfiguration().workspaceConfiguration(
+      this.adapter,
+      items,
+      this.configurationContext(),
+    );
   }
 
   async start(managedServer) {
