@@ -1,3 +1,4 @@
+const { resolutionContext } = require("./helpers/server-resolution");
 const fs = require("node:fs");
 const path = require("node:path");
 const { createProject, removeProject } = require("./helpers/project");
@@ -15,11 +16,19 @@ describe("ide-lemminx discovery and managed metadata", () => {
   });
   it("validates supported Java runtimes and explicit paths", async () => {
     spyOn(server, "javaMajorVersion").and.resolveTo(21);
-    expect(await server.resolveJava(process.execPath, { PATH: "" })).toBe(process.execPath);
-    await expectAsync(server.resolveJava("java")).toBeRejectedWithError(/absolute/);
-    await expectAsync(server.resolveJava(fixture.rootPath)).toBeRejectedWithError(/executable/);
+    expect(
+      (await server.resolveJava(resolutionContext(), process.execPath, { PATH: "" }))?.path ?? null,
+    ).toBe(process.execPath);
+    await expectAsync(server.resolveJava(resolutionContext(), "java")).toBeRejectedWithError(
+      /absolute/,
+    );
+    await expectAsync(
+      server.resolveJava(resolutionContext(), fixture.rootPath),
+    ).toBeRejectedWithError(/executable/);
     server.javaMajorVersion.and.resolveTo(8);
-    await expectAsync(server.resolveJava(process.execPath)).toBeRejectedWithError(/Java 11/);
+    await expectAsync(
+      server.resolveJava(resolutionContext(), process.execPath),
+    ).toBeRejectedWithError(/Java 11/);
   });
   it("skips an unsupported Java runtime rather than hiding a later one", async () => {
     const directories = ["old", "new"].map((name) => path.join(fixture.rootPath, name));
@@ -31,9 +40,13 @@ describe("ide-lemminx discovery and managed metadata", () => {
     spyOn(server, "javaMajorVersion").and.callFake(async (command) =>
       command.startsWith(directories[0]) ? 8 : 11,
     );
-    expect(await server.resolveJava("", { PATH: directories.join(path.delimiter) })).toBe(
-      path.join(directories[1], executable),
-    );
+    expect(
+      (
+        await server.resolveJava(resolutionContext(), "", {
+          PATH: directories.join(path.delimiter),
+        })
+      )?.path ?? null,
+    ).toBe(path.join(directories[1], executable));
   });
   it("prefers explicit, managed, then environment JARs and checks archive signatures", async () => {
     const jars = ["explicit", "managed", "environment"].map((name) =>
@@ -42,11 +55,21 @@ describe("ide-lemminx discovery and managed metadata", () => {
     for (const jar of jars) fs.writeFileSync(jar, Buffer.from([0x50, 0x4b, 3, 4]));
     const managed = { modulePath: jars[1] },
       env = { LEMMINX_JAR: jars[2] };
-    expect(await server.resolveJar(jars[0], managed, env)).toBe(jars[0]);
-    expect(await server.resolveJar("", managed, env)).toBe(jars[1]);
-    expect(await server.resolveJar("", null, env)).toBe(jars[2]);
+    expect(
+      (await server.resolveJar(resolutionContext({ managedServer: managed }), jars[0], env))
+        ?.path ?? null,
+    ).toBe(jars[0]);
+    expect(
+      (await server.resolveJar(resolutionContext({ managedServer: managed }), "", env))?.path ??
+        null,
+    ).toBe(jars[1]);
+    expect(
+      (await server.resolveJar(resolutionContext({ managedServer: null }), "", env))?.path ?? null,
+    ).toBe(jars[2]);
     fs.writeFileSync(jars[0], "not a jar");
-    await expectAsync(server.resolveJar(jars[0], managed, env)).toBeRejectedWithError(/archive/);
+    await expectAsync(
+      server.resolveJar(resolutionContext({ managedServer: managed }), jars[0], env),
+    ).toBeRejectedWithError(/archive/);
   });
   it("selects stable Maven metadata and refuses previews", async () => {
     spyOn(server, "fetchText").and.resolveTo("<metadata><release>0.31.2</release></metadata>");

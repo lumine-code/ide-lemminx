@@ -1,3 +1,4 @@
+const { resolutionContext } = require("./server-resolution");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -21,8 +22,14 @@ test("reject relative paths, directories, invalid JARs and unstable versions", a
     await assert.rejects(server.validateJar(fixture.rootPath), /JAR file/);
     fs.writeFileSync(path.join(fixture.rootPath, "bad.jar"), "bad");
     await assert.rejects(server.validateJar(path.join(fixture.rootPath, "bad.jar")), /archive/);
-    assert.equal(await server.resolveJar("", null, {}), null);
-    assert.equal(await server.resolveJava("", { PATH: "" }), null);
+    assert.equal(
+      (await server.resolveJar(resolutionContext({ managedServer: null }), "", {}))?.path ?? null,
+      null,
+    );
+    assert.equal(
+      (await server.resolveJava(resolutionContext(), "", { PATH: "" }))?.path ?? null,
+      null,
+    );
   } finally {
     removeProject(fixture.rootPath);
   }
@@ -106,10 +113,10 @@ if (process.env.REQUIRE_LEMMINX) {
           {
             displayName: "LemMinX",
             resolveServer: (context) =>
-              server.resolveServer({
-                javaPath: process.env.JAVA_LSP_PATH || "",
-                context: { ...context, configDirPath: fixture.configDirPath },
-              }),
+              server.resolveServer(
+                resolutionContext({ ...context, configDirPath: fixture.configDirPath }),
+                { javaPath: process.env.JAVA_LSP_PATH || "" },
+              ),
             getSettings: () => ({
               xml: { validation: { noGrammar: "ignore" }, codeLens: { enabled: false } },
             }),
