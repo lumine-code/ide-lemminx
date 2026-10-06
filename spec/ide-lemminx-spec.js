@@ -78,6 +78,17 @@ describe("ide-lemminx discovery and managed metadata", () => {
     server.fetchText.and.resolveTo("<metadata/>");
     await expectAsync(server.latestServerVersion()).toBeRejectedWithError(/stable release/);
   });
+  it("uses an explicit JAR without reading a corrupt managed installation", async () => {
+    const jar = path.join(fixture.rootPath, "configured.jar");
+    fs.writeFileSync(jar, Buffer.from([0x50, 0x4b, 3, 4]));
+    const getManagedServer = jasmine
+      .createSpy("getManagedServer")
+      .and.throwError("Corrupt managed record");
+    const context = resolutionContext({ ...fixture, getManagedServer });
+    expect((await server.resolveJar(context, jar)).path).toBe(jar);
+    expect(getManagedServer).not.toHaveBeenCalled();
+    await expectAsync(server.resolveJar(context)).toBeRejectedWithError("Corrupt managed record");
+  });
   it("downloads only the immutable complete artifact with its exact published SHA256", async () => {
     const url =
       "https://repo.eclipse.org/repository/lemminx-maven2-releases/org/eclipse/lemminx/org.eclipse.lemminx/0.31.2/org.eclipse.lemminx-0.31.2-uber.jar";
