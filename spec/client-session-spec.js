@@ -110,9 +110,7 @@ liveSuite("ide-lemminx actual editor providers", () => {
       .provideFindReferences()
       .findReferences(editors.schema, point("schema", 'name="book"', 8));
     expect(refs.references.some(({ path }) => path === fixture.files.schema)).toBe(true);
-    const definitions = await m.provideSymbol().getSymbols({
-      type: "project-find",
-      editor: editors.schema,
+    const definitions = await m.provideDefinitionProvider().getDefinitions(editors.schema, {
       range: { start: point("schema", 'ref="book"', 6) },
     });
     expect(
@@ -121,10 +119,18 @@ liveSuite("ide-lemminx actual editor providers", () => {
           path === fixture.files.schema && Point.fromObject(position).row === 2,
       ),
     ).toBe(true);
+    const documentSymbols = m.provideDocumentSymbolProvider();
     expect(
-      (await m.provideSymbol().getSymbols({ type: "file", editor: editors.main })).some(
-        ({ name }) => name === "book",
-      ),
+      documentSymbols
+        .getDocumentSymbolSources(editors.main)
+        .find(({ id }) => id === "ide-client:ide-lemminx").state,
+    ).toBe("ready");
+    expect(
+      (
+        await documentSymbols.getDocumentSymbols(editors.main, {
+          sourceId: "ide-client:ide-lemminx",
+        })
+      ).some(({ name }) => name === "book"),
     ).toBe(true);
     expect((await m.provideCodeFormatFile().formatEntireFile(editors.main)).length).toBeGreaterThan(
       0,
@@ -200,14 +206,16 @@ liveSuite("ide-lemminx actual editor providers", () => {
         .provideFindReferences()
         .findReferences(editors.schema, point("schema", 'name="book"', 8)),
     ).toBeNull();
-    expect(await m.provideSymbol().getSymbols({ type: "file", editor: editors.main })).toEqual([]);
     expect(
-      await m.provideSymbol().getSymbols({
-        type: "project-find",
-        editor: editors.schema,
+      await m.provideDocumentSymbolProvider().getDocumentSymbols(editors.main, {
+        sourceId: "ide-client:ide-lemminx",
+      }),
+    ).toBeNull();
+    expect(
+      await m.provideDefinitionProvider().getDefinitions(editors.schema, {
         range: { start: point("schema", 'ref="book"', 6) },
       }),
-    ).toEqual([]);
+    ).toBeNull();
     expect(
       await m
         .provideIntentionsList()
