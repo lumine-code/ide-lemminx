@@ -132,20 +132,18 @@ describe("ide-lemminx service edges and settings", () => {
     expect(main.provideBackgroundTips().packageName).toBe("ide-lemminx");
   });
   it("preserves upstream formatting defaults and forwards schema overrides", () => {
-    expect(adapter.getWorkspaceConfiguration("xml.format")).toBeUndefined();
-    expect(adapter.getWorkspaceConfiguration("xml.validation.noGrammar")).toBe("ignore");
+    expect(adapter.getSettings().xml.format).toBeUndefined();
+    expect(adapter.getSettings().xml.validation.noGrammar).toBe("ignore");
     lumine.config.set("ide-lemminx.catalogs", ["catalog.xml"]);
     lumine.config.set("ide-lemminx.fileAssociations", [
       { pattern: "document.xml", systemId: "schema.xsd" },
     ]);
     lumine.config.set("ide-lemminx.splitAttributes", "yes");
-    expect(adapter.getWorkspaceConfiguration("xml.catalogs")).toEqual(["catalog.xml"]);
-    expect(adapter.getWorkspaceConfiguration("xml.fileAssociations")[0].systemId).toBe(
-      "schema.xsd",
-    );
-    expect(adapter.getWorkspaceConfiguration("xml.format.splitAttributes")).toBe(true);
+    expect(adapter.getSettings().xml.catalogs).toEqual(["catalog.xml"]);
+    expect(adapter.getSettings().xml.fileAssociations[0].systemId).toBe("schema.xsd");
+    expect(adapter.getSettings().xml.format.splitAttributes).toBe(true);
     expect(adapter.getInitializationOptions().settings).toEqual(adapter.getSettings());
-    expect(adapter.getWorkspaceConfiguration("unrelated")).toBeUndefined();
+    expect(adapter.getWorkspaceConfiguration).toBeUndefined();
   });
   it("disposes only its provider edge and reacquires the current package generation", async () => {
     const secondCleanup = jasmine.createSpy("second cleanup");
