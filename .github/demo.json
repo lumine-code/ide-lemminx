@@ -1,0 +1,16 @@
+{
+  "title": "ide-lemminx",
+  "description": "LemMinX identifies a mismatched XML closing tag.",
+  "recordedOn": "2026-10-13",
+  "sourceRevision": "c3dec0ec21d696cf3efa47838d6d6d56665ab8c6",
+  "mode": "normal",
+  "fontSettings": "default",
+  "images": [
+    {
+      "file": "demo.png",
+      "label": "LemMinX identifies a mismatched XML closing tag.",
+      "width": 1100,
+      "height": 490
+    }
+  ]
+}

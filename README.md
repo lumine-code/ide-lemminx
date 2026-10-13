@@ -12,6 +12,8 @@ Eclipse LemMinX runs as a separate Java process and provides schema-aware XML ed
 - **Documents**: serve XML, XML Schema and XSL documents recognised by language-xml.
 - **Managed server**: install, update and remove the complete Eclipse uber JAR with its published SHA-256 checksum.
 
+![LemMinX identifies a mismatched XML closing tag.](.github/demo.png)
+
 ## Installation
 
 To install `ide-lemminx` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/ide-lemminx`.
