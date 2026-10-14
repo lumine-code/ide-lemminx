@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<experiment name="Signal Lab">
+  <processing>
+    <window>3</window>
+    <normalize>true</normalize>
+  </process>
+  <output format="csv" />
+</experiment>
