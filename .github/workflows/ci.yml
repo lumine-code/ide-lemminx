@@ -56,9 +56,13 @@ jobs:
       - run: npm pack --dry-run
 
   integration:
-    name: Real LemMinX and Lumine integration
+    name: Real LemMinX and Lumine integration (Java ${{ matrix.java }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ["21.0.13+9", "27.0.0+35"]
     env:
       LUMINE_JASMINE_REPORTER: list
       LUMINE_TEST_PACKAGES: ide language-xml
@@ -88,7 +92,7 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: ${{ matrix.java }}
       - name: Install the exact checksum-verified LemMinX release
         run: |
           curl --fail --location --retry 3 --output lemminx.jar https://repo.eclipse.org/repository/lemminx-maven2-releases/org/eclipse/lemminx/org.eclipse.lemminx/0.31.2/org.eclipse.lemminx-0.31.2-uber.jar
