@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <experiment name="Signal Lab">
+  <metadata>
+    <title>Moving-average experiment</title>
+    <description>Compare smoothing windows for five signal samples.</description>
+    <units>V</units>
+  </metadata>
+  <samples>0.2 0.8 -0.4 0.5 1.0</samples>
   <processing>
     <window>3</window>
     <normalize>true</normalize>
