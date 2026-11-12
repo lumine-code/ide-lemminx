@@ -44,7 +44,7 @@ jobs:
       - name: Install the standalone client test peer
         run: npm ci --omit=dev --ignore-scripts --prefix ../ide
       - run: npm audit --audit-level=high
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@v6.2.0
         with:
           distribution: temurin
           java-version: "21"
@@ -89,7 +89,7 @@ jobs:
           node-version-file: lumine/.nvmrc
           cache: npm
           cache-dependency-path: lumine/package-lock.json
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@v6.2.0
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
