@@ -68,6 +68,7 @@ jobs:
       LUMINE_TEST_PACKAGES: ide language-xml
       LEMMINX_VERSION: 0.31.2
       REQUIRE_LEMMINX: 1
+      LUMINE_TEST_IDE_PATH: ${{ github.workspace }}/ide
     steps:
       - uses: actions/checkout@v7
         with:
@@ -94,10 +95,7 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
       - name: Install the exact checksum-verified LemMinX release
-        run: |
-          curl --fail --location --retry 3 --output lemminx.jar https://repo.eclipse.org/repository/lemminx-maven2-releases/org/eclipse/lemminx/org.eclipse.lemminx/0.31.2/org.eclipse.lemminx-0.31.2-uber.jar
-          echo "f4fde164e785c635e5f86361dbf4b993bfe2c5f83fdb52891d058b7dfc9bcfc8  lemminx.jar" | sha256sum --check
-          echo "LEMMINX_JAR=$GITHUB_WORKSPACE/lemminx.jar" >> "$GITHUB_ENV"
+        run: node ide-lemminx/spec/helpers/install-server.js "$LEMMINX_VERSION" "$GITHUB_WORKSPACE/lemminx-server" "$GITHUB_ENV"
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update || true

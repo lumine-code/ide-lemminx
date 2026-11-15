@@ -98,7 +98,9 @@ describe("ide-lemminx discovery and managed metadata", () => {
           {
             downloadUrl: url,
             maven2: { extension: "jar", version: "0.31.2" },
-            checksum: { sha256: "a".repeat(64) },
+            checksum: {
+              sha256: "f4fde164e785c635e5f86361dbf4b993bfe2c5f83fdb52891d058b7dfc9bcfc8",
+            },
           },
         ],
       }),
@@ -114,9 +116,12 @@ describe("ide-lemminx discovery and managed metadata", () => {
       api: { downloadFile, setServerInstallationStatus() {} },
     });
     expect(downloadFile.calls.mostRecent().args).toEqual([
-      url,
+      "https://download.eclipse.org/releases/2026-09/202609091000/plugins/org.eclipse.lemminx.uber-jar_0.31.2.jar",
       path.join(fixture.rootPath, installed.module),
-      { type: "uncompressed", digest: `sha256:${"a".repeat(64)}` },
+      {
+        type: "uncompressed",
+        digest: "sha256:f4fde164e785c635e5f86361dbf4b993bfe2c5f83fdb52891d058b7dfc9bcfc8",
+      },
     ]);
     expect(installed.module).toBe("org.eclipse.lemminx-0.31.2-uber.jar");
     server.fetchText.and.resolveTo(JSON.stringify({ items: [] }));

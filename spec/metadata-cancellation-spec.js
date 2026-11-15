@@ -73,11 +73,17 @@ describe("LemMinX metadata request lifetime", () => {
     await expectAsync(pending).toBeRejectedWithError("metadata deadline");
     expect(deadline).toHaveBeenCalledOnceWith(30000);
   });
-  it("keeps current HTTP and network failures visible", async () => {
+  it("reports transient metadata failure while selecting the verified release and preserves permanent failures", async () => {
+    const warning = spyOn(console, "warn");
     const fetch = spyOn(global, "fetch").and.resolveTo({ ok: false, status: 503 });
+    expect(await server.latestServerVersion({ signal: controller.signal })).toBe("0.31.2");
+    expect(warning.calls.mostRecent().args[0]).toMatch(
+      /Eclipse answered 503.*reviewed Eclipse SimRel/,
+    );
+    fetch.and.resolveTo({ ok: false, status: 404 });
     await expectAsync(
       server.latestServerVersion({ signal: controller.signal }),
-    ).toBeRejectedWithError(/Eclipse answered 503/);
+    ).toBeRejectedWithError(/Eclipse answered 404/);
     fetch.and.rejectWith(new Error("network offline"));
     await expectAsync(
       server.latestServerVersion({ signal: controller.signal }),
